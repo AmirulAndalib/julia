@@ -1974,7 +1974,7 @@ function has_unbound_vars(@nospecialize sig)
     while sig isa UnionAll
         var = sig.var
         sig = sig.body
-        if !Core.Compiler.constrains_param(var, sig, true)
+        if !Core.Compiler.constrains_param(var, sig, true, true)
             return true
         end
     end

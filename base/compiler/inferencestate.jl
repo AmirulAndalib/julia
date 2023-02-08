@@ -349,7 +349,7 @@ function InferenceState(result::InferenceResult, cache::Symbol, interp::Abstract
 end
 
 """
-    constrains_param(var::TypeVar, sig, covariant::Bool)
+    constrains_param(var::TypeVar, sig, covariant::Bool, type_constrains::Bool)
 
 Check if `var` will be constrained to have a definite value
 in any concrete leaftype subtype of `sig`.
@@ -359,8 +359,12 @@ find a value for a particular type parameter.
 A necessary condition for type intersection to not assign a parameter is that it only
 appears in a `Union[All]` and during subtyping some other union component (that does not
 constrain the type parameter) is selected.
+
+The `type_constrains` flag determines whether Type{T} is considered to be constraining
+`T`. This is not true in general, because of the existence of types with free type
+parameters, however, some callers would like to ignore this corner case.
 """
-function constrains_param(var::TypeVar, @nospecialize(typ), covariant::Bool)
+function constrains_param(var::TypeVar, @nospecialize(typ), covariant::Bool, type_constrains::Bool=false)
     typ === var && return true
     while typ isa UnionAll
         covariant && constrains_param(var, typ.var.ub, covariant) && return true
@@ -394,7 +398,7 @@ function constrains_param(var::TypeVar, @nospecialize(typ), covariant::Bool)
                 if typ.name === typename(Type) && typ.parameters[1] === var && var.ub === Any
                     # Types with free type parameters are <: Type cause the typevar
                     # to be unconstrained because Type{T} with free typevars is illegal
-                    return false
+                    return type_constrains
                 end
                 for i in 1:fc
                     p = typ.parameters[i]
