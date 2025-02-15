@@ -1,12 +1,20 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
-@test Base.Cartesian.exprresolve(:(1 + 3)) == 4
+
 ex = Base.Cartesian.exprresolve(:(if 5 > 4; :x; else :y; end))
 @test ex.args[2] == QuoteNode(:x)
 
 @test Base.Cartesian.lreplace!("val_col", Base.Cartesian.LReplace{String}(:col, "col", 1)) == "val_1"
 @test Base.setindex(CartesianIndex(1,5,4),3,2) == CartesianIndex(1, 3, 4)
-
+@testset "Expression Resolve" begin
+    @test Base.Cartesian.exprresolve(:(1 + 3)) == 4
+    ex1 = Expr(:ref, [1, 2, 3], 2)
+    result1 = Base.Cartesian.exprresolve(ex1)
+    @test result1 == 2
+    ex2 = Expr(:ref, [1, 2, 3], "non-real-index")
+    result2 = Base.Cartesian.exprresolve(ex2)
+    @test result2 == ex2
+end
 @testset "CartesianIndices constructions" begin
     @testset "AbstractUnitRange" begin
         for oinds in [
@@ -532,4 +540,36 @@ end
     CI = CartesianIndex
     inds2 = (1, CI(1, 2), 1, CI(1, 2), 1, CI(1, 2), 1)
     @test (@inferred CI(inds2)) == CI(1, 1, 2, 1, 1, 2, 1, 1, 2, 1)
+end
+
+@testset "@ncallkw" begin
+    f(x...; a, b = 1, c = 2, d = 3) = +(x..., a, b, c, d)
+    x_1, x_2 = (-1, -2)
+    kw = (a = 0, c = 0, d = 0)
+    @test x_1 + x_2 + 1 + 4 == Base.Cartesian.@ncallkw 2 f kw 4 x
+    b = 0
+    kw = (c = 0, d = 0)
+    @test x_1 + x_2 + 4 == Base.Cartesian.@ncallkw 2 f (; a = 0, b, kw...) 4 x
+end
+
+@testset "if with and without else branch" begin
+    t1 = Base.Cartesian.@ntuple 3 i -> i == 1 ? 1 : 0
+    t2 = Base.Cartesian.@ntuple 3 i -> begin
+        m = 0
+        if i == 1
+            m = 1
+        end
+        m
+    end
+    @test t1 == t2
+    t3 = Base.Cartesian.@ntuple 3 i -> begin
+        m = 0
+        if i == 1
+            m = 1
+        elseif i == 2
+            m = 2
+        end
+        m
+    end
+    @test t3 == (1, 2, 0)
 end

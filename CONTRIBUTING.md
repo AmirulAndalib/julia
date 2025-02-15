@@ -164,7 +164,7 @@ To run doctests you need to run `make -C doc doctest=true` from the root directo
 
 #### News-worthy changes
 
-For new functionality and other substantial changes, add a brief summary to `NEWS.md`. The news item should cross reference the pull request (PR) parenthetically, in the form `([#pr])`. To add the PR reference number, first create the PR, then push an additional commit updating `NEWS.md` with the PR reference number.  We periodically run `./julia doc/NEWS-update.jl` from the julia directory to update the cross-reference links, but this should not be done in a typical PR in order to avoid conflicting commits.
+For new functionality and other substantial changes, add a brief summary to `NEWS.md`. The news item should cross reference the pull request (PR) parenthetically, in the form `([#pr])`. To add the PR reference number, first create the PR, then push an additional commit updating `NEWS.md` with the PR reference number. We periodically run `./julia doc/NEWS-update.jl` from the julia directory to update the cross-reference links, but this should not be done in a typical PR in order to avoid conflicting commits.
 
 #### Annotations for new features, deprecations and behavior changes
 
@@ -278,8 +278,8 @@ Be sure to change the UUID value back before making the pull request.
 
 The process of [creating a patch release](https://docs.julialang.org/en/v1/devdocs/build/distributing/#Point-releasing-101) is roughly as follows:
 
-1. Create a new branch (e.g. `backports-release-1.6`) against the relevant minor release
-   branch (e.g. `release-1.6`). Usually a corresponding pull request is created as well.
+1. Create a new branch (e.g. `backports-release-1.10`) against the relevant minor release
+   branch (e.g. `release-1.10`). Usually a corresponding pull request is created as well.
 
 2. Add commits, nominally from `master` (hence "backports"), to that branch.
    See below for more information on this process.
@@ -291,8 +291,8 @@ The process of [creating a patch release](https://docs.julialang.org/en/v1/devdo
    the pull request associated with the backports branch. Fix any issues.
 
 4. Once all test and benchmark reports look good, merge the backports branch into
-   the corresponding release branch (e.g. merge `backports-release-1.6` into
-   `release-1.6`).
+   the corresponding release branch (e.g. merge `backports-release-1.10` into
+   `release-1.10`).
 
 5. Open a pull request that bumps the version of the relevant minor release to the
    next patch version, e.g. as in [this pull request](https://github.com/JuliaLang/julia/pull/37718).
@@ -347,7 +347,7 @@ please remove the `backport-X.Y` tag from the originating pull request for the c
 ### Git Recommendations For Pull Requests
 
  - Avoid working from the `master` branch of your fork, creating a new branch will make it easier if Julia's `master` changes and you need to update your pull request.
- - Try to [squash](http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) together small commits that make repeated changes to the same section of code so your pull request is easier to review. A reasonable number of separate well-factored commits is fine, especially for larger changes.
+ - Try to [squash](https://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) together small commits that make repeated changes to the same section of code so your pull request is easier to review. A reasonable number of separate well-factored commits is fine, especially for larger changes.
  - If any conflicts arise due to changes in Julia's `master`, prefer updating your pull request branch with `git rebase` versus `git merge` or `git pull`, since the latter will introduce merge commits that clutter the git history with noise that makes your changes more difficult to review.
  - Descriptive commit messages are good.
  - Using `git add -p` or `git add -i` can be useful to avoid accidentally committing unrelated changes.
